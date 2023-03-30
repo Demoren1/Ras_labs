@@ -36,12 +36,13 @@ def get_pre_div_2(voltage):
     maxV = 3.2
     ourV = voltage / maxV
     num = ourV * 256
+    our_num = 0
     if num > 240:
         return 2 ** 8 - 1
 
-    for degree in range(9):
-        if 2 ** degree < num:
-            our_num = 2 ** degree - 1
+    for i in range(9):
+        if 32 * i < num:
+            our_num = 2 ** i - 1
         else:
             break
     return our_num
@@ -61,12 +62,14 @@ try:
     while True:
         result = adc()
         led_num = get_pre_div_2(result[2])
+        print(led_num)
         led_sig = decimal2binary(led_num)
         GPIO.output(leds, led_sig)
-        print("our massive %r" % led_sig)
+        # print("our massive %r" % led_sig)
 
 finally:
     GPIO.output(dac, GPIO.LOW)
     GPIO.output(leds, GPIO.LOW)
     GPIO.cleanup(dac)
+    GPIO.cleanup(leds)
 
