@@ -14,7 +14,7 @@ try:
         if percent < 0 or percent > 100:
             continue
         pwm_inst.ChangeDutyCycle(percent)
-        print("voltage is %d" % (3.3*percent/100))
+        print("voltage is %g" % (3.3*percent/100))
 finally:
     pwm_inst.stop()
     GPIO.cleanup()
