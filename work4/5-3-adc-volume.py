@@ -24,8 +24,9 @@ def adc():
         summa += delta_val
         signal = decimal2binary(summa)
         GPIO.output(dac, signal)
-        time.sleep(0.001)
+        time.sleep(0.01)
         comp_value = GPIO.input(comp)
+        # print("comp value is %g" % comp_value)
         if comp_value == 0:
             summa -= delta_val
     voltage = summa / levels * maxV
@@ -33,7 +34,7 @@ def adc():
 
 def get_pre_div_2(voltage):
     our_num = 0
-    maxV = 3.2
+    maxV = 3.3
     ourV = voltage / maxV
     num = ourV * 256
     our_num = 0
@@ -46,30 +47,31 @@ def get_pre_div_2(voltage):
         else:
             break
     return our_num
+def base_adc():
+    GPIO.setup(dac, GPIO.OUT)
+    GPIO.setup(leds, GPIO.OUT)
+    GPIO.setup(troyka, GPIO.OUT, initial = GPIO.HIGH)
+    GPIO.setup(comp, GPIO.IN)
+
+    try:
+        while True:
+            result = adc()
+            print(result)
+            led_num = get_pre_div_2(result[2])
+            # print(led_num)
+            led_sig = decimal2binary(led_num)
+            GPIO.output(leds, led_sig)
+            # print("our massive %r" % led_sig)
+
+    finally:
+        GPIO.output(dac, GPIO.LOW)
+        GPIO.output(leds, GPIO.LOW)
+        GPIO.cleanup(dac)
+        GPIO.cleanup(leds)
+
 
 dac = [26, 19, 13, 6, 5, 11, 9, 10]
 leds = [21, 20, 16, 12, 7, 8, 25, 24]
 comp = 4
 troyka = 17
 initial = 0
-
-GPIO.setup(dac, GPIO.OUT)
-GPIO.setup(leds, GPIO.OUT)
-GPIO.setup(troyka, GPIO.OUT, initial = GPIO.HIGH)
-GPIO.setup(comp, GPIO.IN)
-
-try:
-    while True:
-        result = adc()
-        led_num = get_pre_div_2(result[2])
-        print(led_num)
-        led_sig = decimal2binary(led_num)
-        GPIO.output(leds, led_sig)
-        # print("our massive %r" % led_sig)
-
-finally:
-    GPIO.output(dac, GPIO.LOW)
-    GPIO.output(leds, GPIO.LOW)
-    GPIO.cleanup(dac)
-    GPIO.cleanup(leds)
-
